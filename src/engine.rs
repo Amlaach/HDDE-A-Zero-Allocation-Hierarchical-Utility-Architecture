@@ -41,3 +41,32 @@ impl Default for HDDEngine {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::math::Vec3;
+    use crate::belief::record::BeliefKind;
+    use crate::core::id::EntityId;
+
+    #[test]
+    fn test_engine_tick() {
+        let mut engine = HDDEngine::new();
+        let e1 = engine.spawn_entity(Vec3::zero());
+        
+        assert_eq!(engine.current_tick.0, 0);
+        engine.tick(&[]);
+        assert_eq!(engine.current_tick.0, 1);
+        
+        let event = RawPerceptionEvent {
+            receiver: e1,
+            target: EntityId(99),
+            source_entity: e1,
+            kind: BeliefKind::Position(Vec3::new(10.0, 0.0, 0.0)),
+            confidence: 1.0,
+        };
+        
+        engine.tick(&[event]);
+        assert_eq!(engine.current_tick.0, 2);
+    }
+}

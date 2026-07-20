@@ -1,19 +1,41 @@
 # HDDE: A Zero-Allocation Hierarchical Utility Architecture
 
-A high-performance, purely data-oriented (ECS/SoA based) game AI engine written in Rust.
+![Build Status](https://img.shields.io/github/actions/workflow/status/Amlaach/HDDE-A-Zero-Allocation-Hierarchical-Utility-Architecture/pr_tests.yml?branch=main)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-0.1.0-brightgreen.svg)
 
-## Architecture
+A high-performance, purely data-oriented (ECS/SoA based) game AI engine written in Rust, designed to be seamlessly embedded into game engines via a C-API.
 
-This engine implements a Hierarchical Distributed Decision Engine (HDDE). It replaces traditional monolithic AI controllers (like Behavior Trees) with a 7-stage data pipeline running across flat arrays (Struct of Arrays).
+## 🧠 Architecture Overview
+
+This engine implements a **Hierarchical Distributed Decision Engine (HDDE)**. It replaces traditional monolithic AI controllers (like Behavior Trees) with a 7-stage data pipeline running across flat arrays (Struct of Arrays).
+
+```mermaid
+graph TD
+    subgraph HDDE Engine
+    A[Ingestion] --> B[Decay]
+    B --> C[Needs A-Life]
+    C --> D[Candidates Gen]
+    D --> E[Utility Evaluation]
+    E --> F[Commit Decision]
+    F --> G[Propagation & Comms]
+    G -.-> A
+    end
+    
+    subgraph Game Engine
+    S[Sensors] -->|Raw Perception| A
+    F -->|Chosen Action| M[Anim & Movement]
+    end
+```
 
 ### Key Features
-- **Zero Allocations**: All data is stored in pre-allocated static-size arrays. No runtime heap allocations occur during the core update loop.
-- **Data-Oriented (SoA)**: Maximum CPU cache efficiency.
-- **Utility AI**: Replaces complex behavior trees with multiplicative considerations, providing smooth, unscripted emergent behaviors.
-- **Hierarchical Propagation**: Bottom-up status reporting and top-down intent directives with simulated communication latency.
-- **A-Life Needs System**: Agents have internal needs (hunger, fatigue, curiosity, self-preservation) that naturally decay and affect their tactical utility scores over time, enabling offline open-world simulation.
+- 🚀 **Zero Allocations**: All data is stored in pre-allocated static-size arrays (`SoARegistry`). No runtime heap allocations occur during the core update loop.
+- 🧩 **Data-Oriented (SoA)**: Maximum CPU cache efficiency. Everything runs on tightly packed arrays.
+- ⚖️ **Utility AI**: Replaces complex behavior trees with multiplicative considerations, providing smooth, unscripted emergent behaviors.
+- 📡 **Hierarchical Propagation**: Bottom-up status reporting and top-down intent directives with simulated communication latency.
+- 🧬 **A-Life Needs System**: Agents have internal needs (hunger, fatigue, curiosity, self-preservation) that naturally decay and affect their tactical utility scores over time, enabling offline open-world simulation.
 
-## Building and Running
+## 🛠️ Building and Running
 
 Ensure you have Rust installed.
 
@@ -25,14 +47,10 @@ cargo build --release
 cargo run --example hdde_simulation
 ```
 
-## Structure
+## 🎮 The C-API (Coming Soon)
 
-- `src/core/`: Basic data types (Vec3, ActionKinds, EntityId).
-- `src/registry/`: The `SoARegistry` which holds all entity arrays.
-- `src/belief/`: Belief system and finite-size belief stores.
-- `src/comm/`: The communication channel for delaying and routing messages.
-- `src/stages/`: The 7-stage pipeline (Ingestion, Decay, Needs, Candidates, Utility, Commit, Comms/Propagation).
+A lightweight FFI interface designed for Unity and Unreal Engine integrations. Exposes a simple `hdde_engine_tick()` and `hdde_engine_push_events()` without bridging complex data types, preserving the zero-allocation philosophy.
 
-## License
+## 📝 License
 
-MIT OR Apache-2.0
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

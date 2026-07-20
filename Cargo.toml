@@ -7,6 +7,9 @@ license = "MIT OR Apache-2.0"
 keywords = ["gamedev", "ai", "pathfinding", "utility-ai", "game-engine"]
 categories = ["game-development", "algorithms"]
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

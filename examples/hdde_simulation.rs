@@ -3,13 +3,13 @@ use enemy_ai_engine::stages::ingestion::RawPerceptionEvent;
 use enemy_ai_engine::belief::record::BeliefKind;
 use enemy_ai_engine::core::math::Vec3;
 use enemy_ai_engine::core::id::EntityId;
-use enemy_ai_engine::registry::soa::HierarchyLevel;
+use enemy_ai_engine::core::id::HierarchyLevel;
 
 fn main() {
     let mut engine = HDDEngine::new();
 
     let commander = engine.spawn_entity(Vec3::new(0.0, 0.0, 0.0));
-    engine.registry.hierarchy_level[commander.index()] = HierarchyLevel::Commander;
+    engine.registry.hierarchy_level[commander.index()] = HierarchyLevel::PlatoonCommander;
 
     let squad_leader = engine.spawn_entity(Vec3::new(5.0, 0.0, 5.0));
     engine.registry.hierarchy_level[squad_leader.index()] = HierarchyLevel::SquadLeader;

@@ -1,4 +1,4 @@
-use crate::core::id::EntityId;
+use crate::core::id::{EntityId, HierarchyLevel};
 use crate::core::math::Vec3;
 use crate::belief::store::BeliefStore;
 use crate::core::action::{ActionCandidate, ActionKind, Intent};
@@ -8,12 +8,7 @@ use fixedbitset::FixedBitSet;
 pub const MAX_ENTITIES: usize = 16384;
 pub const MAX_CANDIDATES: usize = 16;
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum HierarchyLevel {
-    Soldier,
-    SquadLeader,
-    Commander,
-}
+
 
 pub struct SoARegistry {
     pub positions: Vec<Vec3>,
@@ -123,5 +118,42 @@ impl SoARegistry {
     #[inline]
     pub fn entity_count(&self) -> usize {
         self.active.count_ones(..)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_spawn_and_despawn() {
+        let mut reg = SoARegistry::new();
+        assert_eq!(reg.entity_count(), 0);
+        let id1 = reg.spawn(Vec3::new(1.0, 2.0, 3.0));
+        let id2 = reg.spawn(Vec3::zero());
+        assert_eq!(reg.entity_count(), 2);
+        assert!(reg.active.contains(id1.index()));
+        assert!(reg.active.contains(id2.index()));
+        
+        reg.despawn(id1);
+        assert_eq!(reg.entity_count(), 1);
+        assert!(!reg.active.contains(id1.index()));
+        assert!(reg.active.contains(id2.index()));
+    }
+
+    #[test]
+    fn test_hierarchy() {
+        let mut reg = SoARegistry::new();
+        let p = reg.spawn_with_role(Vec3::zero(), HierarchyLevel::SquadLeader);
+        let c1 = reg.spawn(Vec3::zero());
+        let c2 = reg.spawn(Vec3::zero());
+        
+        reg.set_parent(c1, p);
+        reg.set_parent(c2, p);
+        
+        assert_eq!(reg.parent_ids[c1.index()], Some(p));
+        assert_eq!(reg.parent_ids[c2.index()], Some(p));
+        assert!(reg.children_ids[p.index()].contains(&c1));
+        assert!(reg.children_ids[p.index()].contains(&c2));
     }
 }

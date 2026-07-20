@@ -19,9 +19,9 @@ struct SelfPreservationConsideration { weight: f32 }
 impl Consideration for SelfPreservationConsideration {
     fn evaluate(&self, idx: usize, candidate: &ActionCandidate, registry: &SoARegistry) -> f32 {
         let health = registry.health[idx];
-        let pres = registry.self_preservation[idx];
+        let pres = f32::max(0.1, registry.self_preservation[idx]); // Prevent 0.0 death trap
         match candidate.kind {
-            ActionKind::Retreat(_) | ActionKind::TakeCover(_) | ActionKind::Flee(_) | ActionKind::Heal(_) => self.weight * (1.0 - health) * pres,
+            ActionKind::Retreat(_) | ActionKind::TakeCover(_) | ActionKind::Flee(_) | ActionKind::Heal(_) => self.weight * f32::max(0.0, 1.0 - health) * pres,
             _ => self.weight * health,
         }
     }
@@ -32,7 +32,7 @@ impl Consideration for AmmoConsideration {
     fn evaluate(&self, idx: usize, candidate: &ActionCandidate, registry: &SoARegistry) -> f32 {
         let ammo = registry.ammo[idx];
         match candidate.kind {
-            ActionKind::Reload => self.weight * (1.0 - ammo),
+            ActionKind::Reload => self.weight * f32::max(0.0, 1.0 - ammo),
             ActionKind::Engage(_) => if ammo < 0.1 { self.weight * 0.1 } else { self.weight * 1.0 },
             _ => self.weight * 1.0,
         }
@@ -44,7 +44,7 @@ impl Consideration for MoraleConsideration {
     fn evaluate(&self, idx: usize, candidate: &ActionCandidate, registry: &SoARegistry) -> f32 {
         let morale = registry.morale[idx];
         match candidate.kind {
-            ActionKind::Flee(_) => self.weight * (1.0 - morale),
+            ActionKind::Flee(_) => self.weight * f32::max(0.0, 1.0 - morale),
             ActionKind::Advance(_) => self.weight * morale,
             _ => self.weight * 0.5,
         }
@@ -69,7 +69,7 @@ impl Consideration for InertiaConsideration {
         if candidate.kind == registry.chosen_action[idx] {
             self.weight * 1.0
         } else {
-            self.weight * 0.5
+            self.weight * 0.8 // 20% penalty, allows Needs to overcome Inertia
         }
     }
 }
@@ -114,5 +114,35 @@ pub fn run(registry: &mut SoARegistry) {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::math::Vec3;
+
+    #[test]
+    fn test_threat_proximity_consideration() {
+        let reg = SoARegistry::new();
+        let cons = ThreatProximityConsideration { weight: 1.0 };
+        
+        let c_engage = ActionCandidate { kind: ActionKind::Engage(crate::core::id::EntityId(1)), score: 0.0 };
+        let c_idle = ActionCandidate { kind: ActionKind::Idle, score: 0.0 };
+        
+        assert!(cons.evaluate(0, &c_engage, &reg) > cons.evaluate(0, &c_idle, &reg));
+    }
+
+    #[test]
+    fn test_self_preservation_consideration() {
+        let mut reg = SoARegistry::new();
+        reg.health[0] = 0.1;
+        reg.self_preservation[0] = 1.0;
+        let cons = SelfPreservationConsideration { weight: 1.0 };
+        
+        let c_flee = ActionCandidate { kind: ActionKind::Flee(Vec3::zero()), score: 0.0 };
+        let c_idle = ActionCandidate { kind: ActionKind::Idle, score: 0.0 };
+        
+        assert!(cons.evaluate(0, &c_flee, &reg) > cons.evaluate(0, &c_idle, &reg));
     }
 }
