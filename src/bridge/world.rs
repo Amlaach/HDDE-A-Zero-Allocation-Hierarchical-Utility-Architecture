@@ -1,5 +1,5 @@
-use crate::core::math::Vec3;
 use crate::core::id::EntityId;
+use crate::core::math::Vec3;
 
 pub trait Perceivable {
     fn position(&self) -> Vec3;

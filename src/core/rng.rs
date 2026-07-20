@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use rand_chacha::ChaCha8Rng;
 use rand::{Rng, SeedableRng};
+use rand_chacha::ChaCha8Rng;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DeterministicRng {

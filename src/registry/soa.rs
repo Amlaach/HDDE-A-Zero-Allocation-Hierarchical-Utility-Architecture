@@ -1,14 +1,12 @@
-use crate::core::id::{EntityId, HierarchyLevel};
-use crate::core::math::Vec3;
 use crate::belief::store::BeliefStore;
 use crate::core::action::{ActionCandidate, ActionKind, Intent};
+use crate::core::id::{EntityId, HierarchyLevel};
+use crate::core::math::Vec3;
 use crate::core::rng::DeterministicRng;
 use fixedbitset::FixedBitSet;
 
 pub const MAX_ENTITIES: usize = 16384;
 pub const MAX_CANDIDATES: usize = 16;
-
-
 
 pub struct SoARegistry {
     pub positions: Vec<Vec3>,
@@ -51,13 +49,23 @@ impl SoARegistry {
             hierarchy_level: vec![HierarchyLevel::Soldier; MAX_ENTITIES],
             parent_ids: vec![None; MAX_ENTITIES],
             children_ids: vec![Vec::new(); MAX_ENTITIES],
-            rng: (0..MAX_ENTITIES).map(|i| DeterministicRng::new(i as u64)).collect(),
+            rng: (0..MAX_ENTITIES)
+                .map(|i| DeterministicRng::new(i as u64))
+                .collect(),
             active: FixedBitSet::with_capacity(MAX_ENTITIES),
             dirty_flag: FixedBitSet::with_capacity(MAX_ENTITIES),
             decision_traces: vec![Vec::new(); MAX_ENTITIES],
         }
     }
-    
+}
+
+impl Default for SoARegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SoARegistry {
     pub fn spawn(&mut self, pos: Vec3) -> EntityId {
         for i in 0..MAX_ENTITIES {
             if !self.active.contains(i) {
@@ -103,15 +111,13 @@ impl SoARegistry {
     pub fn set_parent(&mut self, child: EntityId, parent: EntityId) {
         let child_idx = child.index();
         let parent_idx = parent.index();
-        
+
         if child_idx < MAX_ENTITIES {
             self.parent_ids[child_idx] = Some(parent);
         }
-        
-        if parent_idx < MAX_ENTITIES {
-            if !self.children_ids[parent_idx].contains(&child) {
-                self.children_ids[parent_idx].push(child);
-            }
+
+        if parent_idx < MAX_ENTITIES && !self.children_ids[parent_idx].contains(&child) {
+            self.children_ids[parent_idx].push(child);
         }
     }
 
@@ -134,7 +140,7 @@ mod tests {
         assert_eq!(reg.entity_count(), 2);
         assert!(reg.active.contains(id1.index()));
         assert!(reg.active.contains(id2.index()));
-        
+
         reg.despawn(id1);
         assert_eq!(reg.entity_count(), 1);
         assert!(!reg.active.contains(id1.index()));
@@ -147,10 +153,10 @@ mod tests {
         let p = reg.spawn_with_role(Vec3::zero(), HierarchyLevel::SquadLeader);
         let c1 = reg.spawn(Vec3::zero());
         let c2 = reg.spawn(Vec3::zero());
-        
+
         reg.set_parent(c1, p);
         reg.set_parent(c2, p);
-        
+
         assert_eq!(reg.parent_ids[c1.index()], Some(p));
         assert_eq!(reg.parent_ids[c2.index()], Some(p));
         assert!(reg.children_ids[p.index()].contains(&c1));

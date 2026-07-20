@@ -1,5 +1,5 @@
-use crate::core::time::Tick;
 use crate::core::action::ActionKind;
+use crate::core::time::Tick;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct DecisionTrace {

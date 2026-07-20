@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::core::id::EntityId;
 use crate::core::math::Vec3;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum ActionKind {

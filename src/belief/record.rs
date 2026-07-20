@@ -1,6 +1,6 @@
 use crate::core::id::EntityId;
-use crate::core::time::Tick;
 use crate::core::math::Vec3;
+use crate::core::time::Tick;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BeliefKind {
@@ -24,5 +24,5 @@ pub struct BeliefRecord {
     pub observed_at: Tick,
     pub received_at: Tick,
     pub confidence: f32,
-    pub source_chain_hash: u64, 
+    pub source_chain_hash: u64,
 }

@@ -1,12 +1,12 @@
-use crate::registry::soa::SoARegistry;
 use crate::core::time::Tick;
+use crate::registry::soa::SoARegistry;
 
 const DECAY_RATE: f32 = 0.05;
 const THRESHOLD: f32 = 0.01;
 
 pub fn run(registry: &mut SoARegistry, current_tick: Tick) {
     let active_indices: Vec<usize> = registry.active.ones().collect();
-    
+
     for idx in active_indices {
         let store = &mut registry.beliefs[idx];
         let mut modified = false;

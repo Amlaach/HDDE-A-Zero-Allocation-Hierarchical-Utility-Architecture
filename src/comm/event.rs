@@ -1,7 +1,7 @@
+use crate::belief::record::BeliefRecord;
+use crate::core::action::Intent;
 use crate::core::id::EntityId;
 use crate::core::time::Tick;
-use crate::core::action::Intent;
-use crate::belief::record::BeliefRecord;
 
 #[derive(Clone, Debug)]
 pub enum Payload {

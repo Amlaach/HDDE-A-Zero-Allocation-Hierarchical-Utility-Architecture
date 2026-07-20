@@ -1,9 +1,9 @@
-use enemy_ai_engine::engine::HDDEngine;
-use enemy_ai_engine::stages::ingestion::RawPerceptionEvent;
 use enemy_ai_engine::belief::record::BeliefKind;
-use enemy_ai_engine::core::math::Vec3;
 use enemy_ai_engine::core::id::EntityId;
 use enemy_ai_engine::core::id::HierarchyLevel;
+use enemy_ai_engine::core::math::Vec3;
+use enemy_ai_engine::engine::HDDEngine;
+use enemy_ai_engine::stages::ingestion::RawPerceptionEvent;
 
 fn main() {
     let mut engine = HDDEngine::new();
@@ -24,8 +24,10 @@ fn main() {
     let enemy_id = EntityId(999);
 
     println!("=== HDDE Simulation ===");
-    println!("Entities: Commander({}), SquadLeader({}), SoldierA({}), SoldierB({})",
-        commander.0, squad_leader.0, soldier_a.0, soldier_b.0);
+    println!(
+        "Entities: Commander({}), SquadLeader({}), SoldierA({}), SoldierB({})",
+        commander.0, squad_leader.0, soldier_a.0, soldier_b.0
+    );
     println!();
 
     let events = vec![
@@ -50,8 +52,17 @@ fn main() {
         engine.tick(incoming);
 
         println!("Tick {}: ", tick + 1);
-        for (name, id) in [("Commander", commander), ("SquadLeader", squad_leader), ("SoldierA", soldier_a), ("SoldierB", soldier_b)] {
-            println!("  {}: {:?}", name, engine.registry.chosen_action[id.index()]);
+        for (name, id) in [
+            ("Commander", commander),
+            ("SquadLeader", squad_leader),
+            ("SoldierA", soldier_a),
+            ("SoldierB", soldier_b),
+        ] {
+            println!(
+                "  {}: {:?}",
+                name,
+                engine.registry.chosen_action[id.index()]
+            );
         }
         println!();
     }

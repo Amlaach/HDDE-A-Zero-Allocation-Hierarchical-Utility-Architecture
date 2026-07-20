@@ -27,7 +27,10 @@ impl BeliefStore {
 
         for i in 0..MAX_BELIEFS_PER_ENTITY {
             if let Some(existing) = &mut self.records[i] {
-                if existing.subject_id == new_record.subject_id && core::mem::discriminant(&existing.kind) == core::mem::discriminant(&new_record.kind) {
+                if existing.subject_id == new_record.subject_id
+                    && core::mem::discriminant(&existing.kind)
+                        == core::mem::discriminant(&new_record.kind)
+                {
                     if new_record.observed_at >= existing.observed_at {
                         *existing = new_record;
                     }
@@ -42,7 +45,7 @@ impl BeliefStore {
                 return;
             }
         }
-        
+
         if new_record.confidence > lowest_confidence {
             self.records[lowest_confidence_idx] = Some(new_record);
         }

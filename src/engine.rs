@@ -1,6 +1,6 @@
-use crate::registry::soa::SoARegistry;
 use crate::comm::channel::CommChannel;
 use crate::core::time::Tick;
+use crate::registry::soa::SoARegistry;
 use crate::stages::ingestion::RawPerceptionEvent;
 
 pub struct HDDEngine {
@@ -32,7 +32,11 @@ impl HDDEngine {
         crate::stages::utility::run(&mut self.registry);
         crate::stages::commit::run(&mut self.registry);
         crate::stages::propagation::run(&self.registry, &mut self.comm_channel, self.current_tick);
-        crate::stages::comms::run(&mut self.registry, &mut self.comm_channel, self.current_tick);
+        crate::stages::comms::run(
+            &mut self.registry,
+            &mut self.comm_channel,
+            self.current_tick,
+        );
     }
 }
 
@@ -45,19 +49,19 @@ impl Default for HDDEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::math::Vec3;
     use crate::belief::record::BeliefKind;
     use crate::core::id::EntityId;
+    use crate::core::math::Vec3;
 
     #[test]
     fn test_engine_tick() {
         let mut engine = HDDEngine::new();
         let e1 = engine.spawn_entity(Vec3::zero());
-        
+
         assert_eq!(engine.current_tick.0, 0);
         engine.tick(&[]);
         assert_eq!(engine.current_tick.0, 1);
-        
+
         let event = RawPerceptionEvent {
             receiver: e1,
             target: EntityId(99),
@@ -65,7 +69,7 @@ mod tests {
             kind: BeliefKind::Position(Vec3::new(10.0, 0.0, 0.0)),
             confidence: 1.0,
         };
-        
+
         engine.tick(&[event]);
         assert_eq!(engine.current_tick.0, 2);
     }

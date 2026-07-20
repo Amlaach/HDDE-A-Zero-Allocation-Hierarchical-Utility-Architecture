@@ -1,7 +1,7 @@
-use crate::registry::soa::SoARegistry;
-use crate::core::time::Tick;
-use crate::belief::record::{BeliefRecord, BeliefKind};
+use crate::belief::record::{BeliefKind, BeliefRecord};
 use crate::core::id::EntityId;
+use crate::core::time::Tick;
+use crate::registry::soa::SoARegistry;
 use core::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
 

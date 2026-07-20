@@ -1,5 +1,5 @@
-use crate::registry::soa::SoARegistry;
 use crate::core::action::ActionKind;
+use crate::registry::soa::SoARegistry;
 
 pub fn run(registry: &mut SoARegistry) {
     let active_indices: Vec<usize> = registry.active.ones().collect();
@@ -11,9 +11,10 @@ pub fn run(registry: &mut SoARegistry) {
                 sorted_candidates.push((candidate.kind.clone(), candidate.score));
             }
         }
-        
-        sorted_candidates.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(core::cmp::Ordering::Equal));
-        
+
+        sorted_candidates
+            .sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(core::cmp::Ordering::Equal));
+
         if let Some(best) = sorted_candidates.first() {
             registry.chosen_action[idx] = best.0.clone();
         } else {

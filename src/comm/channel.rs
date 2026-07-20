@@ -20,7 +20,7 @@ impl CommChannel {
     pub fn receive_for(&mut self, receiver: EntityId, current_tick: Tick) -> Vec<CommEvent> {
         let mut delivered = Vec::new();
         let mut i = 0;
-        
+
         while i < self.events.len() {
             if self.events[i].receiver == receiver && self.events[i].delivery_tick <= current_tick {
                 delivered.push(self.events.swap_remove(i));
@@ -28,7 +28,13 @@ impl CommChannel {
                 i += 1;
             }
         }
-        
+
         delivered
+    }
+}
+
+impl Default for CommChannel {
+    fn default() -> Self {
+        Self::new()
     }
 }
