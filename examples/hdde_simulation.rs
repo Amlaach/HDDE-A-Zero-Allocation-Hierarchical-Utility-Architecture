@@ -138,7 +138,6 @@ fn main() {
         // 1. World Simulation & Perception (Zero Allocation in loop via clear)
         for &id in &world.agent_ids {
             let idx = id.index();
-            let pos = engine.registry.positions[idx];
 
             // Simple logic: if hungry, perceive food
             if engine.registry.hunger[idx] > 0.5 {
