@@ -1,13 +1,20 @@
 use crate::comm::channel::CommChannel;
+use crate::core::action::ActionCandidate;
 use crate::core::time::Tick;
 use crate::registry::soa::SoARegistry;
 use crate::stages::ingestion::RawPerceptionEvent;
-use crate::core::action::ActionCandidate;
 use std::time::{Duration, Instant};
 
 pub trait EngineHooks {
     fn generate_candidates(&self, _entity_idx: usize, _registry: &mut SoARegistry) {}
-    fn evaluate_utility(&self, _entity_idx: usize, _candidate: &ActionCandidate, _registry: &SoARegistry) -> Option<f32> { None }
+    fn evaluate_utility(
+        &self,
+        _entity_idx: usize,
+        _candidate: &ActionCandidate,
+        _registry: &SoARegistry,
+    ) -> Option<f32> {
+        None
+    }
 }
 
 pub struct DefaultHooks;
@@ -36,7 +43,11 @@ impl HDDEngine {
         self.tick_with_hooks(incoming_events, &DefaultHooks);
     }
 
-    pub fn tick_with_hooks(&mut self, incoming_events: &[RawPerceptionEvent], hooks: &impl EngineHooks) {
+    pub fn tick_with_hooks(
+        &mut self,
+        incoming_events: &[RawPerceptionEvent],
+        hooks: &impl EngineHooks,
+    ) {
         self.current_tick = self.current_tick + 1;
 
         crate::stages::ingestion::run(&mut self.registry, incoming_events, self.current_tick);
@@ -53,7 +64,11 @@ impl HDDEngine {
         );
     }
 
-    pub fn tick_profiled(&mut self, incoming_events: &[RawPerceptionEvent], hooks: &impl EngineHooks) -> [Duration; 7] {
+    pub fn tick_profiled(
+        &mut self,
+        incoming_events: &[RawPerceptionEvent],
+        hooks: &impl EngineHooks,
+    ) -> [Duration; 7] {
         self.current_tick = self.current_tick + 1;
         let mut timings = [Duration::ZERO; 7];
 

@@ -88,10 +88,10 @@ impl SoARegistry {
                 self.hierarchy_level[i] = HierarchyLevel::Soldier;
                 self.parent_ids[i] = None;
                 self.children_ids[i].clear();
-                
+
                 #[cfg(feature = "debug-trace")]
                 self.decision_traces[i].clear();
-                
+
                 return EntityId(i as u32);
             }
         }

@@ -49,7 +49,10 @@ impl EngineHooks for SimulationHooks {
         // Add a generic explore candidate to encourage emergent behaviour when no needs are pressing
         let rx = registry.rng[idx].gen_f32() * 50.0 - 25.0;
         let ry = registry.rng[idx].gen_f32() * 50.0 - 25.0;
-        add!(ActionKind::CustomPos(0, registry.positions[idx] + Vec3::new(rx, ry, 0.0)));
+        add!(ActionKind::CustomPos(
+            0,
+            registry.positions[idx] + Vec3::new(rx, ry, 0.0)
+        ));
 
         registry.candidates[idx] = candidates;
     }
@@ -104,7 +107,11 @@ fn main() {
         }
         count
     } else {
-        if debug_mode { 1 } else { 100 }
+        if debug_mode {
+            1
+        } else {
+            100
+        }
     };
 
     println!("Initializing HDDE Simulation with {} agents...", num_agents);
@@ -132,7 +139,7 @@ fn main() {
         for &id in &world.agent_ids {
             let idx = id.index();
             let pos = engine.registry.positions[idx];
-            
+
             // Simple logic: if hungry, perceive food
             if engine.registry.hunger[idx] > 0.5 {
                 events.push(RawPerceptionEvent {
@@ -165,7 +172,7 @@ fn main() {
         for &id in &world.agent_ids {
             let idx = id.index();
             let action = &engine.registry.chosen_action[idx];
-            
+
             match action {
                 ActionKind::CustomPos(action_id, target) => {
                     let mut pos = engine.registry.positions[idx];
@@ -189,9 +196,13 @@ fn main() {
         if debug_mode {
             println!("--- Tick {} ---", engine.current_tick.0);
             let idx = world.agent_ids[0].index();
-            println!("Needs: Hunger={:.2}, Fatigue={:.2}, Curiosity={:.2}", 
-                engine.registry.hunger[idx], engine.registry.fatigue[idx], engine.registry.curiosity[idx]);
-            
+            println!(
+                "Needs: Hunger={:.2}, Fatigue={:.2}, Curiosity={:.2}",
+                engine.registry.hunger[idx],
+                engine.registry.fatigue[idx],
+                engine.registry.curiosity[idx]
+            );
+
             #[cfg(feature = "debug-trace")]
             {
                 println!("Candidates:");
@@ -199,24 +210,39 @@ fn main() {
                     println!("  - {:?} : Score {:.2}", kind, score);
                 }
             }
-            
+
             println!("Decision: {:?}", engine.registry.chosen_action[idx]);
         }
     }
 
     let elapsed = start_time.elapsed();
-    
+
     println!("\nSimulation Summary:");
     println!("Total Agents: {}", num_agents);
     println!("Total Ticks: {}", ticks);
     println!("Total Time: {:.2?}", elapsed);
     if elapsed.as_secs_f64() > 0.0 {
-        println!("TPS (Ticks Per Second): {:.0}", (ticks as f64) / elapsed.as_secs_f64());
+        println!(
+            "TPS (Ticks Per Second): {:.0}",
+            (ticks as f64) / elapsed.as_secs_f64()
+        );
     }
 
     println!("\nAverage Stage Times:");
-    let stage_names = ["Ingestion", "Decay", "Needs & Candidates", "Utility", "Commit", "Propagation", "Comms"];
+    let stage_names = [
+        "Ingestion",
+        "Decay",
+        "Needs & Candidates",
+        "Utility",
+        "Commit",
+        "Propagation",
+        "Comms",
+    ];
     for i in 0..7 {
-        println!("{:<20}: {:.2?}", stage_names[i], total_stage_times[i] / (ticks as u32));
+        println!(
+            "{:<20}: {:.2?}",
+            stage_names[i],
+            total_stage_times[i] / (ticks as u32)
+        );
     }
 }
