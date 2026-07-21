@@ -17,6 +17,8 @@ pub enum ActionKind {
     Heal(EntityId),
     Reload,
     Flee(Vec3),
+    Custom(u16),
+    CustomPos(u16, Vec3),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

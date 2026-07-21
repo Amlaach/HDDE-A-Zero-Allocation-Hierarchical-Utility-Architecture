@@ -27,6 +27,7 @@ pub struct SoARegistry {
     pub rng: Vec<DeterministicRng>,
     pub active: FixedBitSet,
     pub dirty_flag: FixedBitSet,
+    #[cfg(feature = "debug-trace")]
     pub decision_traces: Vec<Vec<(ActionKind, f32)>>,
 }
 
@@ -54,6 +55,7 @@ impl SoARegistry {
                 .collect(),
             active: FixedBitSet::with_capacity(MAX_ENTITIES),
             dirty_flag: FixedBitSet::with_capacity(MAX_ENTITIES),
+            #[cfg(feature = "debug-trace")]
             decision_traces: vec![Vec::new(); MAX_ENTITIES],
         }
     }
@@ -86,7 +88,10 @@ impl SoARegistry {
                 self.hierarchy_level[i] = HierarchyLevel::Soldier;
                 self.parent_ids[i] = None;
                 self.children_ids[i].clear();
+                
+                #[cfg(feature = "debug-trace")]
                 self.decision_traces[i].clear();
+                
                 return EntityId(i as u32);
             }
         }

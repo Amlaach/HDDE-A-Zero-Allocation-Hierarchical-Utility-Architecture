@@ -3,8 +3,10 @@ use crate::core::action::{ActionCandidate, ActionKind};
 use crate::core::math::Vec3;
 use crate::registry::soa::SoARegistry;
 
+use crate::engine::EngineHooks;
+
 #[allow(unused_assignments)]
-pub fn run(registry: &mut SoARegistry) {
+pub fn run(registry: &mut SoARegistry, hooks: &impl EngineHooks) {
     let active_indices: Vec<usize> = registry.active.ones().collect();
 
     for idx in active_indices {
@@ -97,5 +99,6 @@ pub fn run(registry: &mut SoARegistry) {
         }
 
         registry.candidates[idx] = candidates;
+        hooks.generate_candidates(idx, registry);
     }
 }

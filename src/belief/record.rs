@@ -15,6 +15,8 @@ pub enum BeliefKind {
     LastKnownDirection(Vec3),
     Health(f32),
     AmmoLevel(f32),
+    Custom(u16, f32),
+    CustomPos(u16, Vec3),
 }
 
 #[derive(Clone, Debug)]

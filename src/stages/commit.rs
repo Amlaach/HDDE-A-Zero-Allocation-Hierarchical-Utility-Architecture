@@ -21,7 +21,10 @@ pub fn run(registry: &mut SoARegistry) {
             registry.chosen_action[idx] = ActionKind::Idle;
         }
 
-        registry.decision_traces[idx] = sorted_candidates.into_iter().take(3).collect();
+        #[cfg(feature = "debug-trace")]
+        {
+            registry.decision_traces[idx] = sorted_candidates.into_iter().take(3).collect();
+        }
         registry.dirty_flag.set(idx, false);
     }
 }

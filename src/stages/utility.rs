@@ -113,7 +113,9 @@ impl Consideration for NeedsConsideration {
     }
 }
 
-pub fn run(registry: &mut SoARegistry) {
+use crate::engine::EngineHooks;
+
+pub fn run(registry: &mut SoARegistry, hooks: &impl EngineHooks) {
     let tp = ThreatProximityConsideration { weight: 1.0 };
     let sp = SelfPreservationConsideration { weight: 1.0 };
     let ac = AmmoConsideration { weight: 1.0 };
@@ -128,11 +130,15 @@ pub fn run(registry: &mut SoARegistry) {
     for idx in active_indices {
         for i in 0..16 {
             let score = if let Some(candidate) = &registry.candidates[idx][i] {
-                let mut total_score = 1.0;
-                for cons in considerations.iter() {
-                    total_score *= cons.evaluate(idx, candidate, registry);
+                if let Some(custom_score) = hooks.evaluate_utility(idx, candidate, registry) {
+                    Some(custom_score)
+                } else {
+                    let mut total_score = 1.0;
+                    for cons in considerations.iter() {
+                        total_score *= cons.evaluate(idx, candidate, registry);
+                    }
+                    Some(total_score)
                 }
-                Some(total_score)
             } else {
                 None
             };
