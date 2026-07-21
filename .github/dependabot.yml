@@ -8,6 +8,9 @@ updates:
       rust-deps:
         patterns:
           - "*"
+        exclude-patterns:
+          - "rand"
+          - "rand_chacha"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
