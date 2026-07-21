@@ -16,8 +16,9 @@ const ACTION_SLEEP: u16 = 2;
 struct SimulationHooks;
 
 impl EngineHooks for SimulationHooks {
+    #[allow(unused_assignments)]
     fn generate_candidates(&self, idx: usize, registry: &mut SoARegistry) {
-        let mut candidates = registry.candidates[idx];
+        let mut candidates = registry.candidates[idx].clone();
         let mut c_idx = 0;
         while c_idx < 16 && candidates[c_idx].is_some() {
             c_idx += 1;
@@ -132,7 +133,7 @@ fn main() {
     let mut total_stage_times = [std::time::Duration::ZERO; 7];
     let start_time = Instant::now();
 
-    for t in 0..ticks {
+    for _t in 0..ticks {
         events.clear();
 
         // 1. World Simulation & Perception (Zero Allocation in loop via clear)
@@ -172,23 +173,20 @@ fn main() {
             let idx = id.index();
             let action = &engine.registry.chosen_action[idx];
 
-            match action {
-                ActionKind::CustomPos(action_id, target) => {
-                    let mut pos = engine.registry.positions[idx];
-                    let dir = (*target - pos).normalize();
-                    pos = pos + dir * 1.0;
-                    engine.registry.positions[idx] = pos;
+            if let ActionKind::CustomPos(action_id, target) = action {
+                let mut pos = engine.registry.positions[idx];
+                let dir = (*target - pos).normalize();
+                pos = pos + dir * 1.0;
+                engine.registry.positions[idx] = pos;
 
-                    // If reached food/rest, reset needs
-                    if pos.distance_sq(*target) < 4.0 {
-                        if *action_id == ACTION_EAT {
-                            engine.registry.hunger[idx] = 0.0;
-                        } else if *action_id == ACTION_SLEEP {
-                            engine.registry.fatigue[idx] = 0.0;
-                        }
+                // If reached food/rest, reset needs
+                if pos.distance_sq(*target) < 4.0 {
+                    if *action_id == ACTION_EAT {
+                        engine.registry.hunger[idx] = 0.0;
+                    } else if *action_id == ACTION_SLEEP {
+                        engine.registry.fatigue[idx] = 0.0;
                     }
                 }
-                _ => {}
             }
         }
 
