@@ -123,11 +123,9 @@ pub fn run(registry: &mut SoARegistry, hooks: &impl EngineHooks) {
     let ic = IntentComplianceConsideration { weight: 1.0 };
     let in_c = InertiaConsideration { weight: 1.0 };
     let nc = NeedsConsideration { weight: 1.0 };
-
     let considerations: [&dyn Consideration; 7] = [&tp, &sp, &ac, &mc, &ic, &in_c, &nc];
-    let active_indices: Vec<usize> = registry.active.ones().collect();
 
-    for idx in active_indices {
+    for idx in registry.active.ones() {
         for i in 0..16 {
             let score = if let Some(candidate) = &registry.candidates[idx][i] {
                 if let Some(custom_score) = hooks.evaluate_utility(idx, candidate, registry) {
